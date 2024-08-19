@@ -170,7 +170,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2024-08-19 15:15:03 / 修改时间：15:23:47" itemprop="dateCreated datePublished" datetime="2024-08-19T15:15:03+08:00">2024-08-19</time>
+              <time title="创建时间：2024-08-19 15:15:03 / 修改时间：15:33:19" itemprop="dateCreated datePublished" datetime="2024-08-19T15:15:03+08:00">2024-08-19</time>
             </span>
 
           
@@ -189,6 +189,9 @@
 
 <p><strong>flaskapp.py</strong></p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, Response</span><br><span class="line"></span><br><span class="line">flask_app = Flask(<span class="string">&#x27;flaskapp&#x27;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@flask_app.route(<span class="params"><span class="string">&#x27;/hello&#x27;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">hello_world</span>():</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;Hello World!&quot;</span></span><br><span class="line"></span><br><span class="line">app = flask_app.wsgi_app</span><br></pre></td></tr></table></figure>
+
+<p><strong>运行</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python wsgi_server.py</span><br></pre></td></tr></table></figure>
 
       
     </div>

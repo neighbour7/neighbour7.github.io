@@ -169,10 +169,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2024-09-10 09:33:58 / 修改时间：17:33:59" itemprop="dateCreated datePublished" datetime="2024-09-10T09:33:58+08:00">2024-09-10</time>
+              <time title="创建时间：2024-09-10 09:33:58" itemprop="dateCreated datePublished" datetime="2024-09-10T09:33:58+08:00">2024-09-10</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-09-11 08:51:04" itemprop="dateModified" datetime="2024-09-11T08:51:04+08:00">2024-09-11</time>
+              </span>
 
           
 
@@ -186,7 +192,7 @@
 
       
           <p>最近看到一个面试问题：多个服务器进程能否同时侦听一个TCP端口号？<br>有经验的同学应该遇到过这样的报错”Address already in use” ，所以我的答案是：IP不一样就能、IP一样就不能<br>但是看作者的答案是：默认（Default）情况下不可以，但是如果配置SO_REUSEADDR，是可以的。</p>
-<p>故写下这篇博客以作记录。</p>
+<p>翻阅多篇文章会发现SO_REUSEADDR、SO_REUSEPORT经常一起出现，这两个参数分别作用于服务端bind阶段和listen阶段。且Linux和Unix(FreeBSD)这两个选项有不一样的作用故写下这篇博客以作记录。</p>
 <p>网络编程中一个TCP连接分为服务端和客户端，服务端需要四步，客户端需要两步。<br>服务端四步为：</p>
 <ol>
 <li>调用socket函数，建立一个套接字</li>
@@ -199,7 +205,7 @@
 <li>调用socket函数，建立一个套接字</li>
 <li>调用connect函数使用该套接字与服务器进行连接</li>
 </ol>
-<p>翻阅多篇文章会发现SO_REUSEADDR、SO_REUSEPORT经常一起出现，这两个参数分别作用于服务端bind阶段和listen阶段。且Linux和Unix(FreeBSD)这两个选项有不一样的作用，首先我们先来看下Linux环境下这两个参数的作用。</p>
+<p>首先我们先来看下Linux环境下这两个参数的作用。</p>
 <h2 id="Linux下SO-REUSEADDR、SO-REUSEPORT选项作用"><a href="#Linux下SO-REUSEADDR、SO-REUSEPORT选项作用" class="headerlink" title="Linux下SO_REUSEADDR、SO_REUSEPORT选项作用"></a>Linux下SO_REUSEADDR、SO_REUSEPORT选项作用</h2><p>查看<code>man 7 socket</code>中SO_REUSEADDR、SO_REUSEPORT含义如下：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">SO_REUSEADDR</span><br><span class="line">       Indicates that the rules used <span class="keyword">in</span> validating addresses supplied <span class="keyword">in</span> a <span class="built_in">bind</span>(2) call should</span><br><span class="line">       allow reuse of <span class="built_in">local</span> addresses.  For AF_INET sockets this means that a socket may <span class="built_in">bind</span>,</span><br><span class="line">       except when there is an active listening socket bound to the address.  When the listen‐</span><br><span class="line">       ing  socket is bound to INADDR_ANY with a specific port <span class="keyword">then</span> it is not possible to <span class="built_in">bind</span></span><br><span class="line">       to this port <span class="keyword">for</span> any <span class="built_in">local</span> address.  Argument is an <span class="built_in">integer</span> boolean flag.</span><br><span class="line"></span><br><span class="line">SO_REUSEPORT (since Linux 3.9)</span><br><span class="line">       Permits multiple AF_INET or AF_INET6 sockets to be bound to  an  identical  socket  ad‐</span><br><span class="line">       dress.   This  option  must be <span class="built_in">set</span> on each socket (including the first socket) prior to</span><br><span class="line">       calling <span class="built_in">bind</span>(2) on the socket.  To prevent port hijacking, all of the processes binding</span><br><span class="line">       to the same address must have the same effective UID.  This option can be employed with</span><br><span class="line">       both TCP and UDP sockets.</span><br><span class="line"></span><br><span class="line">       For TCP sockets, this option allows accept(2) load  distribution  <span class="keyword">in</span>  a  multi-threaded</span><br><span class="line">       server  to  be improved by using a distinct listener socket <span class="keyword">for</span> each thread.  This pro‐</span><br><span class="line">       vides improved load distribution as compared to traditional  techniques  such  using  a</span><br><span class="line">       single  accept(2)ing  thread  that  distributes connections, or having multiple threads</span><br><span class="line">       that compete to accept(2) from the same socket.</span><br><span class="line"></span><br><span class="line">       For UDP sockets, the use of this option can provide  better  distribution  of  incoming</span><br><span class="line">       datagrams  to  multiple processes (or threads) as compared to the traditional technique</span><br><span class="line">       of having multiple processes compete to receive datagrams on the same socket.</span><br></pre></td></tr></table></figure>
 <p>下面通过实验来验证上面的含义</p>
